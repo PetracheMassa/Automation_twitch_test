@@ -17,9 +17,9 @@ setup_logger()
 def setup_browser():
     chrome_options = Options()
     chrome_options.add_argument("--disable-notifications")
-    chrome_options.add_experimental_option("mobileEmulation", {"deviceName": "Pixel 2"})
+    chrome_options.add_experimental_option("mobileEmulation", {"deviceName": "Samsung Galaxy S8+"})
     driver = webdriver.Chrome(options=chrome_options)
-    logging.warning("Browser setup complete")
+    logging.warning("Browser setup complete with mobile emulation for Samsung Galaxy S8+")
     return driver
 
 
@@ -30,25 +30,24 @@ def handle_cookie_popup(driver):
             EC.element_to_be_clickable((By.XPATH, "//button[@data-a-target='consent-banner-accept']"))
         )
         accept_button.click()
-        print("Clicked on 'Accept' button.")
+        logging.info("Clicked on 'Accept' button.")
 
         # Wait until the popup disappears
         WebDriverWait(driver, 10).until(
             EC.invisibility_of_element_located((By.XPATH, "//button[@data-a-target='consent-banner-accept']"))
         )
-        print("Pop-up successfully closed.")
-
+        logging.info("Pop-up successfully closed.")
     except (NoSuchElementException, TimeoutException) as e:
-        print("Failed to close the pop-up:", e)
+        logging.error("Failed to close the pop-up: %s", e)
 
 
 def test_twitch_search():
     logging.info("Starting the test")
 
     driver = setup_browser()
-    driver.get("https://www.twitch.tv")
-    logging.info("Navigated to Twitch")
-    time.sleep(30)
+    driver.get("https://m.twitch.tv")  # Access mobile version directly
+    logging.info("Navigated to Twitch mobile site")
+    time.sleep(3)
 
     handle_cookie_popup(driver)
 
@@ -56,7 +55,6 @@ def test_twitch_search():
         search_icon = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, "//*[@aria-label='Search']")))
         ActionChains(driver).move_to_element(search_icon).click(search_icon).perform()
-
         logging.info("Clicked on search icon")
     except NoSuchElementException:
         logging.error("Search icon not found.")
